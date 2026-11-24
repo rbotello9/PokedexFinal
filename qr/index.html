@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Códigos QR — Pokédex (151)</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #eaefff; color: #202638; margin: 0; padding: 24px }
+  header { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin-bottom: 24px }
+  h1 { margin: 0 } p { margin: 4px 0 0; color: #64748b }
+  .acciones { display: flex; gap: 8px }
+  input { padding: 12px 16px; border: 0; border-radius: 14px; font-size: 15px; min-width: 220px; box-shadow: 0 4px 14px #0001 }
+  button { padding: 12px 18px; border: 0; border-radius: 14px; background: #ef5350; color: #fff; font-weight: 700; cursor: pointer }
+  #grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 16px }
+  .c { background: #fff; border-radius: 20px; padding: 16px; text-align: center; box-shadow: 0 8px 24px #0001; break-inside: avoid }
+  .c img { width: 100%; height: auto; max-width: 170px; image-rendering: pixelated }
+  .c b { display: block; margin-top: 8px } .c small { color: #64748b }
+  .c a { display: block; margin-top: 8px; font-size: 13px; color: #ef5350; font-weight: 700; text-decoration: none }
+  @media print { header, a { display: none } body { background: #fff } }
+</style>
+</head>
+<body>
+  <header>
+    <div>
+      <h1>Códigos QR — Kanto</h1>
+      <p><span id="total">151</span> Pokémon · el contenido de cada QR es <code>pokemon:ID</code> · imágenes en <code>qr/png/</code></p>
+    </div>
+    <div class="acciones">
+      <input id="buscar" type="search" placeholder="Buscar nombre o número...">
+      <button onclick="window.print()">Imprimir</button>
+    </div>
+  </header>
+
+  <div id="grid"></div>
+
+  <script>
+    // La posición en la lista + 1 es el ID: Bulbasaur = 1, ..., Mew = 151
+    const NOMBRES = ('Bulbasaur,Ivysaur,Venusaur,Charmander,Charmeleon,Charizard,Squirtle,Wartortle,Blastoise,Caterpie,' +
+      'Metapod,Butterfree,Weedle,Kakuna,Beedrill,Pidgey,Pidgeotto,Pidgeot,Rattata,Raticate,' +
+      'Spearow,Fearow,Ekans,Arbok,Pikachu,Raichu,Sandshrew,Sandslash,Nidoran♀,Nidorina,' +
+      'Nidoqueen,Nidoran♂,Nidorino,Nidoking,Clefairy,Clefable,Vulpix,Ninetales,Jigglypuff,Wigglytuff,' +
+      'Zubat,Golbat,Oddish,Gloom,Vileplume,Paras,Parasect,Venonat,Venomoth,Diglett,' +
+      'Dugtrio,Meowth,Persian,Psyduck,Golduck,Mankey,Primeape,Growlithe,Arcanine,Poliwag,' +
+      'Poliwhirl,Poliwrath,Abra,Kadabra,Alakazam,Machop,Machoke,Machamp,Bellsprout,Weepinbell,' +
+      'Victreebel,Tentacool,Tentacruel,Geodude,Graveler,Golem,Ponyta,Rapidash,Slowpoke,Slowbro,' +
+      'Magnemite,Magneton,Farfetch\'d,Doduo,Dodrio,Seel,Dewgong,Grimer,Muk,Shellder,' +
+      'Cloyster,Gastly,Haunter,Gengar,Onix,Drowzee,Hypno,Krabby,Kingler,Voltorb,' +
+      'Electrode,Exeggcute,Exeggutor,Cubone,Marowak,Hitmonlee,Hitmonchan,Lickitung,Koffing,Weezing,' +
+      'Rhyhorn,Rhydon,Chansey,Tangela,Kangaskhan,Horsea,Seadra,Goldeen,Seaking,Staryu,' +
+      'Starmie,Mr. Mime,Scyther,Jynx,Electabuzz,Magmar,Pinsir,Tauros,Magikarp,Gyarados,' +
+      'Lapras,Ditto,Eevee,Vaporeon,Jolteon,Flareon,Porygon,Omanyte,Omastar,Kabuto,' +
+      'Kabutops,Aerodactyl,Snorlax,Articuno,Zapdos,Moltres,Dratini,Dragonair,Dragonite,Mewtwo,Mew').split(',');
+
+    const grid = document.getElementById('grid');
+
+    NOMBRES.forEach((nombre, i) => {
+      const id = i + 1;
+      const tarjeta = document.createElement('div');
+      tarjeta.className = 'c';
+      tarjeta.dataset.buscar = `${id} ${nombre}`.toLowerCase();
+
+      const num = String(id).padStart(3, '0');
+      const slug = nombre.toLowerCase().replace('♀', '-f').replace('♂', '-m').replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      const archivo = `png/${num}-${slug}.png`;
+
+      tarjeta.innerHTML = `<img src="${archivo}" alt="QR de ${nombre}" loading="lazy">
+        <b>#${num} ${nombre}</b><small>pokemon:${id}</small>
+        <a href="${archivo}" download>Descargar PNG</a>`;
+      grid.append(tarjeta);
+    });
+
+    // Buscador: oculta las tarjetas que no coinciden
+    document.getElementById('buscar').oninput = (e) => {
+      const q = e.target.value.toLowerCase().trim();
+      let visibles = 0;
+      document.querySelectorAll('.c').forEach((c) => {
+        const ok = c.dataset.buscar.includes(q);
+        c.hidden = !ok;
+        if (ok) visibles++;
+      });
+      document.getElementById('total').textContent = visibles;
+    };
+  </script>
+</body>
+</html>
